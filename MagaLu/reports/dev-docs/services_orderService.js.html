@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/orderService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/orderService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Order = require("../models/Order");
+const hashUtils = require("../utils/hashUtils");
+const OrderEventEmitter = require("./orderEventEmitter");
+const magaLog = require("../utils/loggingExtension"); // :-)
+const fs = require("fs").promises;
+
+// Caminho para o arquivo de hashes processados
+const PROCESSED_HASHES_FILE = "./processed_hashes.json"; // Path for the processed hashes file
+
+// Armazena os usuários e hashes de dados processados
+const users = {};
+let processedHashes = new Set();
+
+/**
+ * Processa arquivos carregados e extrai dados de usuários.
+ * @param {Array} files Arquivos a serem processados.
+ * @returns {Array} Lista de todos os usuários processados.
+ */
+async function processUploadedFiles(files) {
+  // Início da função processUploadedFiles
+  magaLog.log({
+    event: "processUploadedFiles_start",
+    filesCount: files.length,
+  });
+  let allUsers = [];
+  for (const file of files) {
+    // Processamento do arquivo atual
+    magaLog.log({ processing_file: file.path });
+    try {
+      const data = await fs.readFile(file.path, "utf8");
+      // Verificação se o arquivo está vazio
+      if (!data) {
+        magaLog.log({
+          event: "file_is_empty_skipping",
+          error: `File ${file.path} is empty`,
+        });
+        continue;
+      }
+      // Geração de hash do arquivo atual
+      const fileHash = hashUtils.getFileHash(data);
+      // Verificação de duplicação de arquivo
+      if (processedHashes.has(fileHash)) {
+        magaLog.log({
+          event: "skipping_duplicated_file",
+          path: file.path,
+          filename: file.filename,
+          hash: fileHash,
+        });
+        continue;
+      }
+      // Adiciona o hash do arquivo à lista de hashes processados
+      processedHashes.add(fileHash);
+      // Processamento dos dados do arquivo
+      const usersFromData = parseLegacyData(data);
+      allUsers = allUsers.concat(usersFromData);
+      // Depois de processar o arquivo, exclua-o
+      await fs.unlink(file.path);
+    } catch (error) {
+      // Registro de erro na leitura do arquivo
+      magaLog.error({
+        event: "error_processing_file",
+        filePath: file.path,
+        errorMessage: error.message,
+      });
+    }
+  }
+  // Fim da função processUploadedFiles
+  magaLog.log({
+    event: "processUploadedFiles_end",
+    totalProcessedUsers: allUsers.length,
+  });
+  return allUsers;
+}
+
+/**
+ * Processa dados legados de texto, criando e atualizando objetos de ordem para cada linha válida.
+ * Esta função lê cada linha de dados, cria um hash para verificar duplicatas, e processa a linha se ela for única.
+ *
+ * @param {string} data - Dados em formato de texto, onde cada linha representa uma ordem.
+ * @returns {Array} Uma lista de objetos de usuário, com suas ordens e produtos atualizados.
+ */
+function parseLegacyData(data) {
+  magaLog.log({ event: "parseLegacyData_start", dataLength: data.length });
+
+  // Divide os dados em linhas e processa cada uma individualmente.
+  const lines = data.split("\n");
+  let processedCount = 0; // Contador de linhas que resultam em alterações de dados
+
+  const results = lines.reduce((acc, line, index) => {
+    // Ignora linhas vazias ou linhas com somente espaços em branco
+    if (line.trim()) {
+      // Gera um hash MD5 para a linha atual para verificar duplicidade
+      const lineHash = hashUtils.getFileHash(line);
+      // Verifica se já processou essa linha
+      if (!processedHashes.has(lineHash)) {
+        processedHashes.add(lineHash);
+
+        // Extrai os dados da linha
+        const [userId, userName, orderId, prodId, value, date] =
+          extractData(line);
+        // Atualiza ou cria uma nova ordem
+        updateOrCreateOrder(userId, userName, orderId, prodId, value, date);
+        // Adiciona o usuário à lista de usuários processados
+        acc.push(users[userId]);
+
+        // Registra o processamento da linha
+        magaLog.log({
+          event: "line_processed",
+          lineNumber: index + 1,
+          lineHash,
+          lineContent: line,
+          user: users[userId],
+        });
+        processedCount++;
+      } else {
+        // Registra a linha duplicada
+        magaLog.log({
+          event: "skipping_duplicated_line",
+          lineHash,
+          lineContent: line,
+        });
+      }
+    }
+    return acc;
+  }, []);
+
+  // Registra o final do processamento dos dados
+  magaLog.log({
+    event: "parseLegacyData_end",
+    processedLines: processedCount,
+    totalLines: lines.length,
+  });
+  return results;
+}
+
+/**
+ * Extrai os dados de uma linha de dados de ordem.
+ *
+ * @param {string} line - A linha de dados de ordem.
+ * @returns {Array} - Um array contendo os dados extraídos:
+ *   - O ID do usuário (string).
+ *   - O nome do usuário (string).
+ *   - O ID da ordem (número).
+ *   - O ID do produto (número).
+ *   - O valor do produto (número).
+ *   - A data da ordem no formato "AAAA-MM-DD" (string).
+ */
+function extractData(line) {
+  const userId = line.substring(0, 10).trim();
+  const userName = line.substring(10, 55).trim();
+  const orderId = parseInt(line.substring(55, 65).trim(), 10);
+  const prodId = parseInt(line.substring(65, 75).trim(), 10);
+  const value = parseFloat(line.substring(75, 87).trim());
+  const date = line.substring(87, 95);
+  magaLog.log({ "extracted_date:": date });
+  return [userId, userName, orderId, prodId, value, date];
+}
+
+/**
+ * Cria ou atualiza uma ordem para um usuário.
+ *
+ * @param {string} userId - O ID do usuário.
+ * @param {string} userName - O nome do usuário.
+ * @param {number} orderId - O ID da ordem.
+ * @param {number} prodId - O ID do produto.
+ * @param {number} value - O valor do produto.
+ * @param {string} date - A data da ordem no formato "AAAA-MM-DD".
+ * @return {void} Nada é retornado.
+ */
+function updateOrCreateOrder(userId, userName, orderId, prodId, value, date) {
+  // Verifica se o usuário já existe; se não, cria um novo.
+  if (!users[userId]) {
+    users[userId] = new Order(userId, userName);
+  }
+
+  // Tenta encontrar uma ordem existente; se não encontrar, cria uma nova.
+  let order = users[userId].findOrder(orderId);
+  if (!order) {
+    order = users[userId].addOrder(orderId, date);
+  }
+
+  // Adiciona o produto à ordem e atualiza o total.
+  order.products.push({ product_id: prodId, value: value.toFixed(2) });
+  order.total += value; // Atualiza o total acumulado da ordem.
+  order.total = parseFloat(order.total.toFixed(2)); // Garante a precisão de duas casas decimais para o total.
+
+  // Emite um evento de atualização de ordem.
+  OrderEventEmitter.emit("orderUpdated", order);
+}
+
+/**
+ * Adiciona um ouvinte de eventos de atualização de ordem.
+ *
+ * @param {function} listener - A função que será chamada quando o evento "orderUpdated" for emitido.
+ * @return {void} Nada é retornado.
+ */
+exports.onOrderUpdated = (listener) => {
+  OrderEventEmitter.on("orderUpdated", listener);
+};
+
+/**
+ * Remove um ouvinte de eventos de atualização de ordem.
+ *
+ * @param {function} listener - A função que será removida como ouvinte.
+ * @return {void} Nada é retornado.
+ */
+exports.removeOrderListener = (listener) => {
+  OrderEventEmitter.removeListener("orderUpdated", listener);
+};
+
+/**
+ * Filtra as ordens com base nos parâmetros fornecidos.
+ *
+ * @param {Object} options - As opções de filtro.
+ * @param {string} [options.userId] - O ID do usuário.
+ * @param {string} [options.orderId] - O ID da ordem.
+ * @param {string} [options.startDate] - A data de início do intervalo de filtro.
+ * @param {string} [options.endDate] - A data de término do intervalo de filtro.
+ * @return {Array} As ordens correspondentes aos filtros fornecidos.
+ */
+const filterOrders = ({ userId, orderId, startDate, endDate }) => {
+  return Object.values(users).filter((user) => {
+    // Filtra as ordens dos usuários
+    return user.orders.some((order) => {
+      // Verifica se pelo menos uma ordem atende aos critérios de filtro
+      const orderDate = new Date(order.date); // Obtém a data da ordem
+      const start = startDate ? new Date(startDate) : null; // Obtém a data de início do intervalo de filtro, se fornecida
+      const end = endDate ? new Date(endDate) : null; // Obtém a data de término do intervalo de filtro, se fornecida
+      return (
+        (!userId || user.user_id === parseInt(userId, 10)) &amp;&amp; // Verifica se o usuário corresponde ao ID especificado
+        (!orderId || order.order_id === parseInt(orderId, 10)) &amp;&amp; // Verifica se a ordem corresponde ao ID especificado
+        (!startDate || (start &amp;&amp; orderDate >= start)) &amp;&amp; // Verifica se a data da ordem é maior ou igual à data de início do intervalo, se fornecida
+        (!endDate || (end &amp;&amp; orderDate &lt;= end))
+      ); // Verifica se a data da ordem é menor ou igual à data de término do intervalo, se fornecida
+    });
+  });
+};
+
+module.exports = {
+  filterOrders,
+  processUploadedFiles,
+  parseLegacyData,
+  extractData,
+  updateOrCreateOrder,
+  onOrderUpdated: exports.onOrderUpdated,
+  removeOrderListener: exports.removeOrderListener,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Order.html">Order</a></li></ul><h3>Global</h3><ul><li><a href="global.html#destination">destination</a></li><li><a href="global.html#extractData">extractData</a></li><li><a href="global.html#filename">filename</a></li><li><a href="global.html#filterOrders">filterOrders</a></li><li><a href="global.html#getFileHash">getFileHash</a></li><li><a href="global.html#onOrderUpdated">onOrderUpdated</a></li><li><a href="global.html#options">options</a></li><li><a href="global.html#parseLegacyData">parseLegacyData</a></li><li><a href="global.html#processUploadedFiles">processUploadedFiles</a></li><li><a href="global.html#removeOrderListener">removeOrderListener</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#updateOrCreateOrder">updateOrCreateOrder</a></li><li><a href="global.html#uploadLimits">uploadLimits</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Mon May 13 2024 22:54:59 GMT-0300 (Brasilia Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

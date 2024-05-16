@@ -1,0 +1,110 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "LuizaLabs Logistics Challenge ORDER-API",
+    "version": "1.0.0",
+    "description": "API para o desafio de integração logística da LuizaLabs"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:6868/api",
+      "description": "production server"
+    }
+  ],
+  "paths": {
+    "/upload": {
+      "post": {
+        "summary": "Carregar e processar múltiplos arquivos",
+        "description": "Permite o carregamento de múltiplos arquivos, processando-os e retornando os resultados agregados.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista de usuários processados a partir dos arquivos carregados."
+          },
+          "400": {
+            "description": "Nenhum arquivo foi carregado."
+          }
+        }
+      }
+    },
+    "/memory/orders": {
+      "get": {
+        "summary": "Obter pedidos da memória",
+        "description": "Retorna a lista de pedidos armazenados na memória.",
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos da memória."
+          },
+          "404": {
+            "description": "Nenhum pedido encontrado na memória."
+          }
+        }
+      }
+    },
+    "/database/orders": {
+      "get": {
+        "summary": "Obter pedidos do banco de dados",
+        "description": "Retorna a lista de pedidos armazenados no banco de dados com base nos filtros fornecidos.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do usuário para filtrar os pedidos."
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do pedido para filtrar os pedidos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos do banco de dados."
+          },
+          "500": {
+            "description": "Erro ao buscar pedidos."
+          }
+        }
+      }
+    },
+    "/stream-orders": {
+      "get": {
+        "summary": "Transmitir pedidos em tempo real",
+        "description": "Envia os pedidos em tempo real por meio de streaming.",
+        "responses": {
+          "200": {
+            "description": "Pedidos transmitidos com sucesso."
+          },
+          "400": {
+            "description": "Erro ao transmitir pedidos."
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}

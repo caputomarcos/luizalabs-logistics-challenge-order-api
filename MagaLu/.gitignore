@@ -1,0 +1,47 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment Variables
+# .env
+
+# Test Coverage
+coverage/
+
+# Jest
+# jest.config.js
+# jest.config.unit.js
+# jest.config.integration.js
+
+# VS Code
+# .vscode/
+
+# MacOS
+.DS_Store
+
+# npm
+package-lock.json
+
+# Folders for build and dependencies
+
+
+# Swagger
+# swagger.json
+
+# Temporary files
+tmp/
+temp/
+
+# Debug
+debug/
+.idea/
+
+# Docs
+docs/
