@@ -52,24 +52,25 @@ sequenceDiagram
 ```mermaid
 graph TD
     A[Início] -->|Faz Upload de Arquivo| B[API]
-    B --> C{Processamento em Memória}
-    C -->|Verificar Duplicidade de HASH| D[Checa Duplicidade]
-    D -->|Não Duplicado| E[Processa e Gera HASH]
-    D -->|Duplicado| F[Término]
-    E --> G[Salva Dados Processados]
-    E --> H[Salva HASH]
-    G -->|MongoDB Externo| I[Armazenamento de Dados no MongoDB Persistente]
-    H -->|Armazenamento Externo| J[Armazenamento de HASH em Disco Persistente]
-    I --> K[Fim]
-    J --> K
+    B -->|Carregar HASH de Arquivo/Linha ao Inicializar Serviço| C[Arquivo de HASH Persistente]
+    C -->|Carregar em Memória HASH de Arquivo/Linha| D[Memória]
+    D --> E{Processamento em Memória}
+    E -->|Verificar Duplicidade de HASH| F[Checa Duplicidade]
+    F -->|Não Duplicado| G[Processa e Gera HASH]
+    F -->|Duplicado| H[Término]
+    G --> I[Salva Dados Processados]
+    G --> J[Salva HASH]
+    G --> M[Fim]
+    I -->|MongoDB Externo| K[Armazenamento de Dados no MongoDB Persistente]
+    J -->|Armazenamento Externo| L[Armazenamento de HASH em Disco Persistente]
 
     style B fill:#8b548b,stroke:#333,stroke-width:2px
-    style F fill:#8b548b,stroke:#333,stroke-width:2px
-    style G fill:#0066b0,stroke:#333,stroke-width:2px,stroke-dasharray: 15 5
-    style H fill:#999000,stroke:#333,stroke-width:2px,stroke-dasharray: 15 5
-    style I fill:#0066b0,stroke:#333,stroke-width:2px
-    style J fill:#999000,stroke:#333,stroke-width:2px
-    style K fill:#8b548b,stroke:#333,stroke-width:2px
+    style H fill:#8b548b,stroke:#333,stroke-width:2px
+    style I fill:#0066b0,stroke:#333,stroke-width:2px,stroke-dasharray: 15 5
+    style J fill:#999000,stroke:#333,stroke-width:2px,stroke-dasharray: 15 5
+    style K fill:#0066b0,stroke:#333,stroke-width:2px
+    style L fill:#999000,stroke:#333,stroke-width:2px
+    style M fill:#8b548b,stroke:#333,stroke-width:2px
     style A font-weight:bold, font-color:black
     style B font-weight:bold, font-color:black
     style C font-weight:bold, font-color:black
@@ -78,11 +79,11 @@ graph TD
     style F font-weight:bold, font-color:black
     style G font-weight:bold, font-color:black
     style H font-weight:bold, font-color:black
-
-
     style I font-weight:bold, font-color:black
     style J font-weight:bold, font-color:black
     style K font-weight:bold, font-color:black
+    style L font-weight:bold, font-color:black
+    style M font-weight:bold, font-color:black
 ```
 
 ## Funcionalidades Principais
