@@ -1,4 +1,4 @@
-# LuizaLabs Logistics Challenge ORDER-API
+# LuizaLabs Logistics Challenge ORDER-API (1.0.0)
 
 Este projeto é uma implementação para o desafio técnico da LuizaLabs/Vertical Logística. O principal objetivo é transformar dados de pedidos desnormalizados de um sistema legado em um formato JSON normalizado, acessível via uma API REST.
 
@@ -78,6 +78,8 @@ graph TD
     style F font-weight:bold, font-color:black
     style G font-weight:bold, font-color:black
     style H font-weight:bold, font-color:black
+
+
     style I font-weight:bold, font-color:black
     style J font-weight:bold, font-color:black
     style K font-weight:bold, font-color:black
@@ -125,6 +127,41 @@ Após iniciar a aplicação, você pode acessar o dashboard no seguinte endereç
   
   ![Dashboard](https://github.com/caputomarcos/luizalabs-logistics-challenge-order-api/assets/3945941/bc67399c-29cf-4a8e-89f0-f27d78863477)
 
+
+## Exemplos de Chamadas API
+
+### Carregar Múltiplos Arquivos
+
+```bash
+curl -X POST http://localhost:6868/api/upload \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@data_1.txt" \
+  -F "file=@data_2.txt"
+```
+
+### Obter Pedidos da Memória
+
+```bash
+curl -X GET http://localhost:6868/api/memory/orders
+```
+
+### Obter Pedidos da Memória com Filtros
+
+```bash
+curl -X GET "http://localhost:6868/api/memory/orders?userId=85&orderId=909"
+```
+
+### Obter Pedidos do MongoDB com Filtros
+
+```bash
+curl -X GET "http://localhost:6868/api/database/orders?userId=1000000200&orderId=1839"
+```
+
+### Transmitir Pedidos em Tempo Real
+
+```bash
+curl -X GET http://localhost:6868/api/stream-orders
+```
 
 ## Documentação da API
 
