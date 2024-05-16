@@ -26,7 +26,7 @@ sequenceDiagram
     participant ArquivoHash as Arquivo de HASH Persistente
 
     rect rgb(139, 84, 139)
-    API->>+ArquivoHash: Carregar HASH de Arquivo/Linha ao Inicializar Serviço
+    API->>+ArquivoHash: Carregar HASH de Arquivo/Linha ao Inicializar Serviço (servidor UP)
     end
     ArquivoHash->>Memória: Carregar em Memória HASH de Arquivo/Linha
     rect rgb(139, 84, 139)
