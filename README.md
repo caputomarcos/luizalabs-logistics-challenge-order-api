@@ -37,7 +37,7 @@ sequenceDiagram
         Memória->>Memória: Verificar Duplicidade de Linha,<br/>Processar e Gerar HASH do arquivo/linha
     end
     rect rgb(139, 84, 139)
-    Memória->>API: Retornar Arquivo Normalizado JSON
+    Memória->>API: Retornar Arquivo JSON Normalizado
     API-->>-Cliente: Confirmação de Recebimento
     end
     rect rgb(0, 102, 176)
