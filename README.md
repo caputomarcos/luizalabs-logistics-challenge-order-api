@@ -43,7 +43,7 @@ sequenceDiagram
     Memória->>+ArquivoHash: Salvar HASH de Arquivo/Linha
     end
     rect rgb(139, 84, 139)
-    Memória->>API: Retorna Arquivo Normalizado JSON
+    Memória->>API: Retornar Arquivo Normalizado JSON
     API-->>-Cliente: Confirmação de Recebimento
     end
 ```
