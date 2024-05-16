@@ -130,7 +130,7 @@ Após iniciar a aplicação, você pode acessar o dashboard no seguinte endereç
 
 ## Exemplos de Chamadas API
 
-🔗 **Baixe e explore a coleção aqui:**
+🔗 **Baixe a coleção do Postman para o projeto ORDER-API aqui:**
 [LuizaLabs ORDER-API Postman Collection](https://raw.githubusercontent.com/caputomarcos/luizalabs-logistics-challenge-order-api/main/luizalabs-logistics-challenge-order-api.postman_collection.json)
 
 ### Carregar Múltiplos Arquivos
