@@ -1,0 +1,152 @@
+{
+	"info": {
+		"_postman_id": "5595ebe5-9da4-4c71-8301-af987db5f0b4",
+		"name": "API de Processamento de Pedidos",
+		"description": "Esta coleção inclui chamadas API para processar e recuperar pedidos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1535218"
+	},
+	"item": [
+		{
+			"name": "Carregar múltiplos arquivos",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [
+								"/C:/Users/caput/Downloads/desafio tecnico-20231023T182341Z-001 (2)/desafio tecnico/data_1.txt",
+								"/C:/Users/caput/Downloads/desafio tecnico-20231023T182341Z-001 (2)/desafio tecnico/data_2.txt"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:6868/api/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6868",
+					"path": [
+						"api",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter pedidos da memória",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6868/api/memory/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6868",
+					"path": [
+						"api",
+						"memory",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter pedidos da memória com filtro com filtros",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6868/api/memory/orders?userId=66&orderId=705",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6868",
+					"path": [
+						"api",
+						"memory",
+						"orders"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "66"
+						},
+						{
+							"key": "orderId",
+							"value": "705"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter pedidos do MongoDB com filtros",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6868/api/database/orders?userId=1000000200&orderId=1839",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6868",
+					"path": [
+						"api",
+						"database",
+						"orders"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1000000200"
+						},
+						{
+							"key": "orderId",
+							"value": "1839"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transmitir pedidos em tempo real",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6868/api/stream-orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6868",
+					"path": [
+						"api",
+						"stream-orders"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
