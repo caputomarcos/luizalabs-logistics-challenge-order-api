@@ -122,8 +122,7 @@ Após iniciar a aplicação, você pode acessar o dashboard no seguinte endereç
 
 - **Dashboard:** [http://localhost:6868/](http://localhost:6868/)
   
-  ![Dashboard](https://github.com/caputomarcos/luiza-pedidos-api/assets/3945941/adb0cfcc-aed0-46fb-95c4-3241e28ec858)
-
+  ![Dashboard](https://github.com/caputomarcos/luizalabs-logistics-challenge-order-api/assets/3945941/bc67399c-29cf-4a8e-89f0-f27d78863477)
 
 
 ## Documentação da API
