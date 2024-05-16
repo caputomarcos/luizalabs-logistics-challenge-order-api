@@ -30,11 +30,11 @@ sequenceDiagram
     end
     ArquivoHash->>Memória: Carregar em Memória HASH de Arquivo/Linha
     rect rgb(139, 84, 139)
-    Cliente->>+API: Faz Upload de Arquivo
+    Cliente->>+API: Faz Upload de Arquivo desnormalizado
     end
     loop Normalizar e Processar
-        Memória->>Memória: Verificar Duplicidade de HASH de Arquivo/Linha
-        Memória->>Memória: Processar e Gerar HASH de Arquivo/Linha
+        Memória->>Memória: Verificar Duplicidade de HASH de Arquivo
+        Memória->>Memória: Verificar Duplicidade de Linha,<br/>Processar e Gerar HASH do arquivo/linha
     end
     rect rgb(0, 102, 176)
     Memória->>+MongoDB: Salvar Dados Processados
@@ -43,6 +43,7 @@ sequenceDiagram
     Memória->>+ArquivoHash: Salvar HASH de Arquivo/Linha
     end
     rect rgb(139, 84, 139)
+    Memória->>API: Retornar Arquivo Normalizado JSON
     API-->>-Cliente: Confirmação de Recebimento
     end
 ```
@@ -122,8 +123,7 @@ Após iniciar a aplicação, você pode acessar o dashboard no seguinte endereç
 
 - **Dashboard:** [http://localhost:6868/](http://localhost:6868/)
   
-  ![Dashboard](https://github.com/caputomarcos/luiza-pedidos-api/assets/3945941/adb0cfcc-aed0-46fb-95c4-3241e28ec858)
-
+  ![Dashboard](https://github.com/caputomarcos/luizalabs-logistics-challenge-order-api/assets/3945941/bc67399c-29cf-4a8e-89f0-f27d78863477)
 
 
 ## Documentação da API
