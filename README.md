@@ -36,15 +36,15 @@ sequenceDiagram
         Memória->>Memória: Verificar Duplicidade de HASH de Arquivo
         Memória->>Memória: Verificar Duplicidade de Linha,<br/>Processar e Gerar HASH do arquivo/linha
     end
+    rect rgb(139, 84, 139)
+    Memória->>API: Retornar Arquivo Normalizado JSON
+    API-->>-Cliente: Confirmação de Recebimento
+    end
     rect rgb(0, 102, 176)
     Memória->>+MongoDB: Salvar Dados Processados
     end
     rect rgb(153, 144, 0)
     Memória->>+ArquivoHash: Salvar HASH de Arquivo/Linha
-    end
-    rect rgb(139, 84, 139)
-    Memória->>API: Retornar Arquivo Normalizado JSON
-    API-->>-Cliente: Confirmação de Recebimento
     end
 ```
 
