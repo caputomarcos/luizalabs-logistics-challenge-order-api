@@ -58,9 +58,9 @@ graph TD
     E -->|Verificar Duplicidade de HASH| F[Checa Duplicidade]
     F -->|Não Duplicado| G[Processa e Gera HASH]
     F -->|Duplicado| H[Término]
-    G -->|Registra Pedidos Normalizados no Banco de Dados| I[Salva Dados Processados]
-    G -->|Salva Hash de Arquivo/Linha| J[Salva HASH]
-    G --> |Retorna JSON|M[Fim]
+    G -->I[Armazena Dados de Pedidos Processados]
+    G -->J[Armazena Hashes de Arquivo/Linha]
+    G -->|Retorna JSON|M[Fim]
     I -->|MongoDB Externo| K[Armazenamento de Dados no MongoDB Persistente]
     J -->|Armazenamento Externo| L[Armazenamento de HASH em Disco Persistente]
 
