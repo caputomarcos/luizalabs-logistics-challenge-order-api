@@ -52,7 +52,7 @@ sequenceDiagram
 ```mermaid
 graph TD
     A[Início] -->|Faz Upload de Arquivo| B[API]
-    B -->|Carregar HASH de Arquivo/Linha ao Inicializar Serviço| C[Arquivo de HASH Persistente]
+    B -->|Carregar HASH de Arquivo/Linha ao Inicializar Serviço (Servidor UP)| C[Arquivo de HASH Persistente]
     C -->|Carregar em Memória HASH de Arquivo/Linha| D[Memória]
     D --> E{Processamento em Memória}
     E -->|Verificar Duplicidade de HASH| F[Checa Duplicidade]
